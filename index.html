@@ -23,7 +23,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
+      background-color: rgba(0, 0, 0, 0.7);
       z-index: 9999;
       justify-content: center;
       align-items: center;
@@ -33,6 +33,34 @@
       width: 200px;
       height: 200px;
       object-fit: contain;
+    }
+  </style>
+  <style>
+    .loader {
+      border-top-color: #3498db;
+      -webkit-animation: spin 1s linear infinite;
+      animation: spin 1s linear infinite;
+      border-radius: 50%;
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #3498db;
+      width: 96px;
+      height: 96px;
+    }
+    @-webkit-keyframes spin {
+      0% {
+        -webkit-transform: rotate(0deg);
+      }
+      100% {
+        -webkit-transform: rotate(360deg);
+      }
+    }
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
     }
     body {
       font-family: 'Inter', sans-serif;
@@ -84,8 +112,8 @@
 </head>
 <body class="bg-gray-50 text-gray-800 h-full">
   <!-- Loading Overlay -->
-  <div id="loading-overlay">
-    <img src="https://i2.wp.com/media.boingboing.net/wp-content/uploads/2015/10/tumblr_nlohpxGdBi1tlivlxo1_12801.gif?zoom=2&w=970" alt="Loading..." />
+  <div id="loading-overlay" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+    <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-24 w-24"></div>
   </div>
 
   <div id="root" class="min-h-full">
@@ -108,9 +136,9 @@
           <a href="/" class="hover:text-yellow-300 transition border-b-2 border-white px-2 py-1 text-sm">Home</a>
           <a href="profildesa.html" class="hover:text-yellow-300 hover:border-b-2 hover:border-yellow-300 transition px-2 py-1 text-sm">Profil Desa</a>
           <a href="infografis.html" class="hover:text-yellow-300 hover:border-b-2 hover:border-yellow-300 transition px-2 py-1 text-sm">Infografis</a>
-          <a href="video.html" class="hover:text-yellow-300 hover:border-b-2 hover:border-yellow-300 transition px-2 py-1 text-sm">Video</a>
-          <a href="/listing" class="hover:text-yellow-300 hover:border-b-2 hover:border-yellow-300 transition px-2 py-1 text-sm">Listing</a>
-          <a href="/belanja" class="hover:text-yellow-300 hover:border-b-2 hover:border-yellow-300 transition px-2 py-1 text-sm">Belanja</a>
+          <!-- Removed Video link as per user request -->
+          <a href="listing.html" class="hover:text-yellow-300 hover:border-b-2 hover:border-yellow-300 transition px-2 py-1 text-sm">Listing</a>
+          <a href="belanja.html" class="hover:text-yellow-300 hover:border-b-2 hover:border-yellow-300 transition px-2 py-1 text-sm">Belanja</a>
         </nav>
 
         <!-- Mobile Menu Button -->
@@ -149,11 +177,11 @@
               <i class="fas fa-video w-6"></i>
               <span>Video</span>
             </a>
-            <a href="/listing" class="flex items-center space-x-3 hover:text-yellow-300 transition py-3 px-4 text-white text-lg rounded-lg hover:bg-white/10">
+            <a href="listing.html" class="flex items-center space-x-3 hover:text-yellow-300 transition py-3 px-4 text-white text-lg rounded-lg hover:bg-white/10">
               <i class="fas fa-list w-6"></i>
               <span>Listing</span>
             </a>
-            <a href="/belanja" class="flex items-center space-x-3 hover:text-yellow-300 transition py-3 px-4 text-white text-lg rounded-lg hover:bg-white/10">
+            <a href="belanja.html" class="flex items-center space-x-3 hover:text-yellow-300 transition py-3 px-4 text-white text-lg rounded-lg hover:bg-white/10">
               <i class="fas fa-shopping-cart w-6"></i>
               <span>Belanja</span>
             </a>
@@ -168,6 +196,34 @@
       const menu = document.getElementById('mobile-menu');
       menu.classList.toggle('translate-x-full');
     }
+
+    function showLoading() {
+      const overlay = document.getElementById('loading-overlay');
+      overlay.classList.remove('hidden');
+    }
+
+    function hideLoading() {
+      const overlay = document.getElementById('loading-overlay');
+      overlay.classList.add('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const links = document.querySelectorAll('a[href]');
+      links.forEach(link => {
+        link.addEventListener('click', function(e) {
+          // Only show loading if link is external or different page
+          if (this.href && this.href !== window.location.href && !this.href.includes('#') && !this.href.startsWith('javascript:')) {
+            showLoading();
+          }
+        });
+      });
+    });
+
+    window.addEventListener('pageshow', function(event) {
+      if (event.persisted) {
+        hideLoading();
+      }
+    });
   </script>
 
   <!-- Hero Section -->
@@ -661,22 +717,42 @@
   </div><!-- end of root div -->
 
   <script>
-    // Function to show loading overlay
-    function showLoading() {
-      const overlay = document.getElementById('loading-overlay');
-      overlay.style.display = 'flex';
+    function toggleMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('translate-x-full');
     }
 
-    // Add click event listener to all links
+    function showLoading() {
+      const overlay = document.getElementById('loading-overlay');
+      overlay.classList.remove('hidden');
+    }
+
+    function hideLoading() {
+      const overlay = document.getElementById('loading-overlay');
+      overlay.classList.add('hidden');
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-      const links = document.getElementsByTagName('a');
-      for (let link of links) {
+      const links = document.querySelectorAll('a[href]');
+      const buttons = document.querySelectorAll('button');
+      links.forEach(link => {
         link.addEventListener('click', function(e) {
-          // Don't show loading for hash links (anchors) or javascript: links
-          if (!this.href.includes('#') && !this.href.includes('javascript:')) {
+          if (this.href && this.href !== window.location.href && !this.href.includes('#') && !this.href.startsWith('javascript:')) {
             showLoading();
           }
         });
+      });
+      buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+          showLoading();
+          button.disabled = true;
+        });
+      });
+    });
+
+    window.addEventListener('pageshow', function(event) {
+      if (event.persisted) {
+        hideLoading();
       }
     });
   </script>
