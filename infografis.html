@@ -59,13 +59,13 @@
 <body class="bg-gray-50 text-gray-800 h-full">
   <div id="root" class="min-h-full">
 
- <!-- Header -->
+  <!-- Header (copied from index.html) -->
   <header class="bg-red-800 sticky top-0 z-50">
     <div class="container mx-auto px-4 py-4">
       <div class="flex items-center justify-between">
         <!-- Logo and Title -->
         <div class="flex items-center gap-4">
-          <img src="fotokkn/logokabposo.png" alt="Logo Kabupaten Poso" class="h-[64px] w-[45px] object-contain" />
+          <img src="fotokkn/logokabposo (1).png" alt="Logo Kabupaten Poso" class="h-[64px] w-[45px] object-contain" />
           <div class="text-white">
             <h1 class="text-2xl md:text-3xl font-bold">Desa Labuadago</h1>
             <p class="text-base md:text-lg">Kabupaten Poso</p>
@@ -200,6 +200,10 @@
         <i class="fas fa-store mr-2"></i>
         Perdagangan
       </button>
+      <button data-category="cuaca" class="category-btn bg-red-100 text-red-800 px-6 py-3 rounded-lg font-medium hover:bg-red-200 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+        <i class="fas fa-cloud-sun mr-2"></i>
+        Cuaca
+      </button>
     </div>
 
     <!-- Content Sections -->
@@ -231,6 +235,23 @@
         </div>
       </div>
     </div>
+
+      <div id="cuaca-content" class="content-section hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 max-w-3xl mx-auto space-y-12">
+          <div>
+            <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Data Cuaca Desa Labuadago</h3>
+            <div class="w-full max-w-lg mx-auto">
+              <canvas id="weatherChart"></canvas>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Penyinaran Matahari Desa Labuadago</h3>
+            <div class="w-full max-w-lg mx-auto">
+              <canvas id="sunshineChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
 
     <div id="sosial-content" class="content-section hidden">
       <div class="bg-white rounded-lg shadow-lg p-6 mb-12 max-w-3xl mx-auto">
@@ -326,20 +347,25 @@
             }
           });
           
-          // Then update content visibility and reinitialize chart if needed
-          contentSections.forEach(section => {
-            if (section.id === `${category}-content`) {
-              section.classList.remove('hidden');
-              if (category === 'penduduk') {
-                // Reinitialize chart with animation
-                setTimeout(() => {
-                  initGenderChart();
-                }, 50); // Small delay to ensure DOM is ready
-              }
-            } else {
-              section.classList.add('hidden');
-            }
-          });
+      // Then update content visibility and reinitialize chart if needed
+      contentSections.forEach(section => {
+        if (section.id === `${category}-content`) {
+          section.classList.remove('hidden');
+          if (category === 'penduduk') {
+            // Reinitialize chart with animation
+            setTimeout(() => {
+              initGenderChart();
+            }, 50); // Small delay to ensure DOM is ready
+          } else if (category === 'cuaca') {
+            // Initialize weather bar chart
+            setTimeout(() => {
+              initWeatherChart();
+            }, 50);
+          }
+        } else {
+          section.classList.add('hidden');
+        }
+      });
         });
       });
 
@@ -352,6 +378,7 @@
 
       // Initialize chart variable
       let genderChart = null;
+      let weatherChart = null;
 
       // Function to create/update gender chart
       function initGenderChart() {
@@ -423,6 +450,147 @@
                     const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
                     const percentage = ((value / total) * 100).toFixed(1);
                     return `${label}: ${value} orang (${percentage}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Function to create/update weather bar chart
+      function initWeatherChart() {
+        if (weatherChart) {
+          weatherChart.destroy();
+        }
+        if (sunshineChart) {
+          sunshineChart.destroy();
+        }
+
+        const ctx = document.getElementById('weatherChart').getContext('2d');
+        weatherChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+            datasets: [{
+              label: 'Suhu (°C)',
+              data: [27.5, 27.1, 27.7, 27.7, 28.4, 27.2, 28.0, 28.0, 28.5, 28.6, 28.3, 28.1],
+              backgroundColor: '#ef4444',
+              borderColor: '#991b1b',
+              borderWidth: 1,
+              borderRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+              y: {
+                beginAtZero: false,
+                title: {
+                  display: true,
+                  text: 'Suhu (°C)',
+                  font: {
+                    family: 'Inter',
+                    size: 14,
+                    weight: 'bold'
+                  }
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Bulan',
+                  font: {
+                    family: 'Inter',
+                    size: 14,
+                    weight: 'bold'
+                  }
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                  font: {
+                    family: 'Inter',
+                    size: 14
+                  }
+                }
+              },
+              tooltip: {
+                enabled: true,
+                callbacks: {
+                  label: function(context) {
+                    return context.parsed.y + ' °C';
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        const ctxSunshine = document.getElementById('sunshineChart').getContext('2d');
+        sunshineChart = new Chart(ctxSunshine, {
+          type: 'bar',
+          data: {
+            labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+            datasets: [{
+              label: 'Penyinaran Matahari (%)',
+              data: [45, 61, 50, 65, 64, 55, 69, 74, 85, 82, 72, 40],
+              backgroundColor: '#facc15',
+              borderColor: '#ca8a04',
+              borderWidth: 1,
+              borderRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+                title: {
+                  display: true,
+                  text: 'Penyinaran Matahari (%)',
+                  font: {
+                    family: 'Inter',
+                    size: 14,
+                    weight: 'bold'
+                  }
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Bulan',
+                  font: {
+                    family: 'Inter',
+                    size: 14,
+                    weight: 'bold'
+                  }
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                  font: {
+                    family: 'Inter',
+                    size: 14
+                  }
+                }
+              },
+              tooltip: {
+                enabled: true,
+                callbacks: {
+                  label: function(context) {
+                    return context.parsed.y + ' %';
                   }
                 }
               }
