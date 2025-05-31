@@ -59,7 +59,7 @@
 <body class="bg-gray-50 text-gray-800 h-full">
   <div id="root" class="min-h-full">
 
- <!-- Header -->
+  <!-- Header (copied from index.html) -->
   <header class="bg-red-800 sticky top-0 z-50">
     <div class="container mx-auto px-4 py-4">
       <div class="flex items-center justify-between">
@@ -146,7 +146,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       const links = document.querySelectorAll('a[href]');
       const navigationButtons = document.querySelectorAll('button:not(.category-btn)');
-      
+
       // Handle navigation links
       links.forEach(link => {
         link.addEventListener('click', function(e) {
@@ -240,18 +240,18 @@
         <div class="bg-white rounded-lg shadow-lg p-6 max-w-3xl mx-auto space-y-12">
           <div>
             <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Data Cuaca Desa Labuadago</h3>
-            <div class="w-full max-w-lg mx-auto">
-              <canvas id="weatherChart"></canvas>
-            </div>
+          <div class="w-full max-w-lg mx-auto">
+            <canvas id="weatherChart" width="600" height="400"></canvas>
           </div>
-          <div>
-            <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Penyinaran Matahari Desa Labuadago</h3>
-            <div class="w-full max-w-lg mx-auto">
-              <canvas id="sunshineChart"></canvas>
-            </div>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Penyinaran Matahari Desa Labuadago</h3>
+          <div class="w-full max-w-lg mx-auto">
+            <canvas id="sunshineChart" width="600" height="400"></canvas>
           </div>
         </div>
       </div>
+    </div>
 
     <div id="sosial-content" class="content-section hidden">
       <div class="bg-white rounded-lg shadow-lg p-6 mb-12 max-w-3xl mx-auto">
@@ -340,6 +340,15 @@
           categoryButtons.forEach(button => {
             if (button.dataset.category === category) {
               button.classList.remove('bg-red-100', 'text-red-800');
+              categoryButtons.forEach(button => {
+                if (button.dataset.category === category) {
+                  button.classList.remove('bg-red-100', 'text-red-800');
+                  button.classList.add('bg-red-800', 'text-white');
+                } else {
+                  button.classList.remove('bg-red-800', 'text-white');
+                  button.classList.add('bg-red-100', 'text-red-800');
+                }
+              });
               button.classList.add('bg-red-800', 'text-white');
             } else {
               button.classList.remove('bg-red-800', 'text-white');
@@ -379,6 +388,7 @@
       // Initialize chart variable
       let genderChart = null;
       let weatherChart = null;
+      let sunshineChart = null;
 
       // Function to create/update gender chart
       function initGenderChart() {
