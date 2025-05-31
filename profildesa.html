@@ -3,18 +3,64 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Infografis Desa Labuadago</title>
+  <title>Profil Desa Labuadago</title>
   <link rel="icon" type="image/png" href="fotokkn/faviconkabposo.png" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     html {
       touch-action: manipulation;
       -webkit-text-size-adjust: 100%;
       -ms-text-size-adjust: 100%;
+    }
+    
+    /* Loading Overlay Styles */
+    #loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    #loading-overlay img {
+      width: 200px;
+      height: 200px;
+      object-fit: contain;
+    }
+  </style>
+  <style>
+    .loader {
+      border-top-color: #3498db;
+      -webkit-animation: spin 1s linear infinite;
+      animation: spin 1s linear infinite;
+      border-radius: 50%;
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #3498db;
+      width: 96px;
+      height: 96px;
+    }
+    @-webkit-keyframes spin {
+      0% {
+        -webkit-transform: rotate(0deg);
+      }
+      100% {
+        -webkit-transform: rotate(360deg);
+      }
+    }
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
     }
     body {
       font-family: 'Inter', sans-serif;
@@ -23,8 +69,9 @@
       overflow-x: hidden;
       position: relative;
       -webkit-font-smoothing: antialiased;
-      background-color: #f9fafb;
-      color: #1f2937;
+    }
+    .bg-overlay {
+      background-color: rgba(0, 0, 0, 0.5);
     }
     @media screen and (max-width: 640px) {
       * {
@@ -57,9 +104,14 @@
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 h-full">
+  <!-- Loading Overlay -->
+  <div id="loading-overlay">
+    <img src="https://i2.wp.com/media.boingboing.net/wp-content/uploads/2015/10/tumblr_nlohpxGdBi1tlivlxo1_12801.gif?zoom=2&w=970" alt="Loading..." />
+  </div>
+
   <div id="root" class="min-h-full">
 
-  <!-- Header (copied from index.html) -->
+  <!-- Header -->
   <header class="bg-red-800 sticky top-0 z-50">
     <div class="container mx-auto px-4 py-4">
       <div class="flex items-center justify-between">
@@ -75,8 +127,8 @@
         <!-- Desktop Navigation -->
         <nav class="hidden md:flex items-center gap-3 text-white font-medium ml-8">
           <a href="index.html" class="hover:text-yellow-300 transition px-2 py-1 text-sm">Home</a>
-          <a href="profildesa.html" class="hover:text-yellow-300 transition px-2 py-1 text-sm">Profil Desa</a>
-          <a href="infografis.html" class="hover:text-yellow-300 border-b-2 border-yellow-300 transition px-2 py-1 text-sm">Infografis</a>
+          <a href="profildesa.html" class="hover:text-yellow-300 border-b-2 border-yellow-300 transition px-2 py-1 text-sm">Profil Desa</a>
+          <a href="infografis.html" class="hover:text-yellow-300 transition px-2 py-1 text-sm">Infografis</a>
           <a href="listing.html" class="hover:text-yellow-300 transition px-2 py-1 text-sm">Listing</a>
           <a href="belanja.html" class="hover:text-yellow-300 transition px-2 py-1 text-sm">Belanja</a>
         </nav>
@@ -105,11 +157,11 @@
               <i class="fas fa-home w-6"></i>
               <span>Home</span>
             </a>
-            <a href="profildesa.html" class="flex items-center space-x-3 hover:text-yellow-300 transition py-3 px-4 text-white text-lg rounded-lg hover:bg-white/10">
+            <a href="profildesa.html" class="flex items-center space-x-3 text-yellow-300 transition py-3 px-4 text-white text-lg rounded-lg bg-white/10">
               <i class="fas fa-building w-6"></i>
               <span>Profil Desa</span>
             </a>
-            <a href="infografis.html" class="flex items-center space-x-3 text-yellow-300 transition py-3 px-4 text-white text-lg rounded-lg bg-white/10">
+            <a href="infografis.html" class="flex items-center space-x-3 hover:text-yellow-300 transition py-3 px-4 text-white text-lg rounded-lg hover:bg-white/10">
               <i class="fas fa-chart-pie w-6"></i>
               <span>Infografis</span>
             </a>
@@ -145,22 +197,11 @@
 
     document.addEventListener('DOMContentLoaded', function() {
       const links = document.querySelectorAll('a[href]');
-      const navigationButtons = document.querySelectorAll('button:not(.category-btn)');
-
-      // Handle navigation links
       links.forEach(link => {
         link.addEventListener('click', function(e) {
           if (this.href && this.href !== window.location.href && !this.href.includes('#') && !this.href.startsWith('javascript:')) {
             showLoading();
           }
-        });
-      });
-
-      // Handle non-category buttons (like mobile menu)
-      navigationButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-          showLoading();
-          button.disabled = true;
         });
       });
     });
@@ -172,117 +213,310 @@
     });
   </script>
 
-  <!-- Main Content: Infografis based on Administrasi Penduduk data from index.html -->
-  <main class="container mx-auto px-6 py-12">
-    <h2 class="text-3xl font-bold text-red-800 mb-8 text-center">Infografis Administrasi Penduduk</h2>
-    <p class="text-center max-w-3xl mx-auto mb-12 text-gray-700">
-      Berikut adalah data administrasi penduduk Desa Labuadago yang disajikan dalam bentuk infografis.
-    </p>
-    <!-- Category Navigation -->
-    <div class="flex flex-wrap justify-center gap-4 mb-8">
-      <button data-category="penduduk" class="category-btn bg-red-800 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-        <i class="fas fa-users mr-2"></i>
-        Penduduk
-      </button>
-      <button data-category="sosial" class="category-btn bg-red-100 text-red-800 px-6 py-3 rounded-lg font-medium hover:bg-red-200 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-        <i class="fas fa-hands-helping mr-2"></i>
-        Sosial
-      </button>
-      <button data-category="pertanian" class="category-btn bg-red-100 text-red-800 px-6 py-3 rounded-lg font-medium hover:bg-red-200 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-        <i class="fas fa-tractor mr-2"></i>
-        Pertanian
-      </button>
-      <button data-category="industri" class="category-btn bg-red-100 text-red-800 px-6 py-3 rounded-lg font-medium hover:bg-red-200 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-        <i class="fas fa-industry mr-2"></i>
-        Industri
-      </button>
-      <button data-category="perdagangan" class="category-btn bg-red-100 text-red-800 px-6 py-3 rounded-lg font-medium hover:bg-red-200 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-        <i class="fas fa-store mr-2"></i>
-        Perdagangan
-      </button>
-      <button data-category="cuaca" class="category-btn bg-red-100 text-red-800 px-6 py-3 rounded-lg font-medium hover:bg-red-200 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-        <i class="fas fa-cloud-sun mr-2"></i>
-        Cuaca
-      </button>
+  <!-- Hero Section -->
+  <section class="relative h-[300px] bg-cover bg-center" style="background-image: url('fotokkn/fotoseminar.jpg');">
+    <div class="absolute inset-0 bg-gradient-to-b from-red-900/70 to-red-800/70"></div>
+    <div class="container mx-auto px-6 h-full flex flex-col justify-center relative z-10 text-white max-w-5xl">
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Profil Desa Labuadago</h1>
+      <p class="text-lg md:text-xl max-w-3xl">Mengenal lebih dekat tentang sejarah, potensi, dan kehidupan masyarakat Desa Labuadago</p>
     </div>
+  </section>
 
-    <!-- Content Sections -->
-    <div id="penduduk-content" class="content-section">
-      <!-- Current penduduk content here -->
-      <div class="bg-white rounded-lg shadow-lg p-6 mb-12 max-w-3xl mx-auto">
-        <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Data Gender Penduduk</h3>
-        <div class="w-full max-w-lg mx-auto">
-          <canvas id="genderChart"></canvas>
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-12">
+    <!-- Overview Section -->
+    <section class="mb-12">
+      <h2 class="text-3xl font-bold text-red-800 mb-6">Sekilas Tentang Desa</h2>
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <p class="text-gray-700 leading-relaxed mb-6">
+          Desa Labuadago adalah sebuah desa yang terletak di Kabupaten Poso, Sulawesi Tengah. Desa ini memiliki kekayaan alam yang melimpah dan budaya yang khas, menjadikannya salah satu desa yang unik di kawasan ini.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          <div class="p-4 bg-red-50 rounded-lg">
+            <i class="fas fa-map-marker-alt text-3xl text-red-800 mb-3"></i>
+            <h3 class="font-semibold text-lg mb-2">Lokasi Strategis</h3>
+            <p class="text-gray-600">Terletak di jalur strategis Kabupaten Poso</p>
+          </div>
+          <div class="p-4 bg-red-50 rounded-lg">
+            <i class="fas fa-users text-3xl text-red-800 mb-3"></i>
+            <h3 class="font-semibold text-lg mb-2">Populasi</h3>
+            <p class="text-gray-600">1.045 Jiwa dengan 285 Kepala Keluarga</p>
+          </div>
+          <div class="p-4 bg-red-50 rounded-lg">
+            <i class="fas fa-mountain text-3xl text-red-800 mb-3"></i>
+            <h3 class="font-semibold text-lg mb-2">Luas Wilayah</h3>
+            <p class="text-gray-600">±8.42 km² area yang subur</p>
+          </div>
         </div>
       </div>
+    </section>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
-        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-          <p class="text-4xl font-extrabold text-red-800">1.045</p>
-          <p class="font-semibold text-gray-700">Penduduk</p>
+    <!-- Sejarah & Visi Misi Section -->
+    <section class="mb-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-2xl font-bold text-red-800 mb-4">Sejarah Desa</h2>
+          <p class="text-gray-700 leading-relaxed">
+            Lokasi dan Pendahuluan<br />
+            Desa Labuadago terletak di Kecamatan Lage, Kabupaten Poso, Provinsi Sulawesi Tengah. Desa ini merupakan hasil pemekaran dari Desa Le yang terjadi pada tahun 2013. Pemekaran ini dilatarbelakangi oleh peristiwa kerusuhan yang melanda Poso pada tahun 2000, yang menyebabkan banyak penduduk Desa Le mengungsi ke wilayah ini.
+          </p>
+          <p class="text-gray-700 leading-relaxed mt-4">
+            Latar Belakang Pemekaran<br />
+            Kerusuhan Poso yang terjadi pada awal tahun 2000 mengakibatkan banyak warga Desa Le kehilangan tempat tinggal dan terpaksa mencari perlindungan di daerah yang lebih aman. Dalam proses pengungsian ini, mereka menemukan tempat yang layak untuk tinggal di wilayah yang kini dikenal sebagai Desa Labuadago. Seiring dengan bertambahnya jumlah penduduk yang mengungsi, kebutuhan akan pengelolaan yang lebih baik dan identitas desa yang jelas semakin mendesak.
+          </p>
+          <p class="text-gray-700 leading-relaxed mt-4">
+            Pendirian Desa Labuadago<br />
+            Pada tahun 2013, dengan dukungan dari pemerintah setempat dan kesepakatan di antara para pengungsi, Desa Labuadago resmi dibentuk. Nama "Labuadago" diambil dari bahasa lokal yang memiliki makna khusus, mencerminkan harapan dan semangat baru bagi penduduk yang telah mengalami masa sulit. Desa ini menjadi simbol ketahanan dan kebangkitan bagi masyarakat yang pernah mengalami trauma akibat kerusuhan.
+          </p>
+          <p class="text-gray-700 leading-relaxed mt-4">
+            Perkembangan Desa<br />
+            Sejak didirikan, Desa Labuadago terus berkembang baik dari segi infrastruktur maupun sosial. Masyarakat desa berupaya membangun kehidupan yang lebih baik dengan mengembangkan pertanian, pendidikan, dan kegiatan sosial. Keberadaan Desa Labuadago tidak hanya memberikan tempat tinggal yang aman bagi para pengungsi, tetapi juga menciptakan komunitas yang solid dan saling mendukung.
+          </p>
+          <p class="text-gray-700 leading-relaxed mt-4">
+            Keunikan dan Ciri Khas<br />
+            Desa Labuadago memiliki keunikan tersendiri, baik dari segi budaya maupun alam. Masyarakatnya masih mempertahankan tradisi dan adat istiadat yang diwariskan oleh nenek moyang, serta mengembangkan kuliner lokal yang kaya rasa. Keindahan alam sekitar juga menjadi daya tarik tersendiri bagi pengunjung yang ingin menikmati suasana pedesaan yang asri.
+          </p>
         </div>
-        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-          <p class="text-4xl font-extrabold text-red-800">524</p>
-          <p class="font-semibold text-gray-700">Laki-laki</p>
-        </div>
-        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-          <p class="text-4xl font-extrabold text-red-800">521</p>
-          <p class="font-semibold text-gray-700">Perempuan</p>
-        </div>
-        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-          <p class="text-4xl font-extrabold text-red-800">285</p>
-          <p class="font-semibold text-gray-700">Kepala Keluarga</p>
-        </div>
-      </div>
-    </div>
-
-      <div id="cuaca-content" class="content-section hidden">
-        <div class="bg-white rounded-lg shadow-lg p-6 max-w-3xl mx-auto space-y-12">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-2xl font-bold text-red-800 mb-4">Visi dan Misi</h2>
+          <div class="mb-6">
+            <h3 class="font-semibold text-lg mb-2">Visi</h3>
+            <p class="text-gray-700">
+              "Menjadikan Desa Labuadago menjadi desa tertib, administrasi, sejahtera, Transparan dan beriman melalui bidang pertanian dan kesehatan."
+            </p>
+          </div>
           <div>
-            <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Data Cuaca Desa Labuadago</h3>
-          <div class="w-full max-w-lg mx-auto">
-            <canvas id="weatherChart" width="600" height="400"></canvas>
+            <h3 class="font-semibold text-lg mb-2">Misi</h3>
+            <ul class="space-y-2 text-gray-700">
+              <li class="flex items-start">
+                <i class="fas fa-check text-red-800 mt-1 mr-2"></i>
+                <span>Meningkatkan sumber daya masyarakat melalui pendidikan formal dan informal.</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-check text-red-800 mt-1 mr-2"></i>
+                <span>Bekerjasama dengan petugas penyuluh lapangan dan instansi terkait untuk meningkatkan hasil pertanian yang merata.</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-check text-red-800 mt-1 mr-2"></i>
+                <span>Mewujudkan dan mengelolah Pendapatan Asli Desa (PAD)</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-check text-red-800 mt-1 mr-2"></i>
+                <span>Mewujudkan Pemerintahan yang baik dan bersih melalui pelaksanaan Otonomi Daerah.</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-check text-red-800 mt-1 mr-2"></i>
+                <span>Transparansi dan akuntabel serta tertib Administrasi.</span>
+              </li>
+            </ul>
           </div>
         </div>
-        <div>
-          <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Penyinaran Matahari Desa Labuadago</h3>
-          <div class="w-full max-w-lg mx-auto">
-            <canvas id="sunshineChart" width="600" height="400"></canvas>
+      </div>
+    </section>
+
+    <!-- Struktur Pemerintahan -->
+    <section class="mb-12">
+      <h2 class="text-3xl font-bold text-red-800 mb-6">Struktur Pemerintahan Desa</h2>
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="text-center p-4">
+            <div class="w-24 h-24 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-user-tie text-4xl text-red-800"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Jemi Samels Purapande</h3>
+            <p class="text-red-800 font-medium">Kepala Desa</p>
+          </div>
+          <div class="text-center p-4">
+            <div class="w-24 h-24 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-user text-4xl text-red-800"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Sekretaris Desa</h3>
+            <p class="text-gray-600">Administrasi & Tata Kelola</p>
+          </div>
+          <div class="text-center p-4">
+            <div class="w-24 h-24 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-users text-4xl text-red-800"></i>
+            </div>
+            <h3 class="font-bold text-lg mb-2">BPD</h3>
+            <p class="text-gray-600">Badan Permusyawaratan Desa</p>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div id="sosial-content" class="content-section hidden">
-      <div class="bg-white rounded-lg shadow-lg p-6 mb-12 max-w-3xl mx-auto">
-        <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Data Sosial</h3>
-        <p class="text-center text-gray-600">Data sosial akan ditampilkan di sini</p>
+    <!-- Struktur Organisasi Desa -->
+    <section class="mb-20 bg-white rounded-lg shadow-lg p-8">
+      <h2 class="text-3xl font-bold text-red-800 mb-8 text-center">Struktur Organisasi Desa</h2>
+      
+      <!-- Level 1 - Kepala Desa -->
+      <div class="flex justify-center mb-12">
+        <div class="bg-red-800 text-white rounded-lg p-6 shadow-lg w-64 text-center">
+          <div class="w-20 h-20 mx-auto bg-white rounded-full flex items-center justify-center mb-4">
+            <i class="fas fa-user-tie text-3xl text-red-800"></i>
+          </div>
+          <h3 class="font-bold text-lg">Kepala Desa</h3>
+          <p class="text-white/90 mt-1">Jemi Samels Purapande</p>
+        </div>
       </div>
-    </div>
 
-    <div id="pertanian-content" class="content-section hidden">
-      <div class="bg-white rounded-lg shadow-lg p-6 mb-12 max-w-3xl mx-auto">
-        <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Data Pertanian</h3>
-        <p class="text-center text-gray-600">Data pertanian akan ditampilkan di sini</p>
+      <!-- Connecting Line -->
+      <div class="w-1 h-8 bg-red-800/50 mx-auto -mt-8 mb-8"></div>
+
+      <!-- Level 2 - Sekretaris -->
+      <div class="flex justify-center mb-12">
+        <div class="bg-red-700 text-white rounded-lg p-6 shadow-lg w-64 text-center">
+          <div class="w-16 h-16 mx-auto bg-white rounded-full flex items-center justify-center mb-4">
+            <i class="fas fa-user text-2xl text-red-800"></i>
+          </div>
+          <h3 class="font-bold text-lg">Sekretaris Desa</h3>
+          <p class="text-white/90 mt-1">Risman Darianto Maugo</p>
+        </div>
       </div>
-    </div>
 
-    <div id="industri-content" class="content-section hidden">
-      <div class="bg-white rounded-lg shadow-lg p-6 mb-12 max-w-3xl mx-auto">
-        <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Data Industri</h3>
-        <p class="text-center text-gray-600">Data industri akan ditampilkan di sini</p>
+      <!-- Connecting Line -->
+      <div class="w-1 h-8 bg-red-800/50 mx-auto -mt-8 mb-8"></div>
+
+      <!-- Level 3 - Kasi -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto relative mb-12">
+        <div class="bg-red-600 text-white rounded-lg p-6 shadow-lg text-center">
+          <div class="w-14 h-14 mx-auto bg-white rounded-full flex items-center justify-center mb-3">
+            <i class="fas fa-shield-alt text-xl text-red-800"></i>
+          </div>
+          <h3 class="font-bold">Kasi Pemerintahan</h3>
+          <p class="text-white/90 mt-1 text-sm">Jefri Tompodung</p>
+        </div>
+        <div class="bg-red-600 text-white rounded-lg p-6 shadow-lg text-center">
+          <div class="w-14 h-14 mx-auto bg-white rounded-full flex items-center justify-center mb-3">
+            <i class="fas fa-hands-helping text-xl text-red-800"></i>
+          </div>
+          <h3 class="font-bold">Kasi Pelayanan</h3>
+          <p class="text-white/90 mt-1 text-sm">Oktovina Busoso</p>
+        </div>
+        <div class="bg-red-600 text-white rounded-lg p-6 shadow-lg text-center">
+          <div class="w-14 h-14 mx-auto bg-white rounded-full flex items-center justify-center mb-3">
+            <i class="fas fa-handshake text-xl text-red-800"></i>
+          </div>
+          <h3 class="font-bold">Kasi Kesejahteraan</h3>
+          <p class="text-white/90 mt-1 text-sm">Frensi Ombitaka</p>
+        </div>
       </div>
-    </div>
 
-    <div id="perdagangan-content" class="content-section hidden">
-      <div class="bg-white rounded-lg shadow-lg p-6 mb-12 max-w-3xl mx-auto">
-        <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Data Perdagangan</h3>
-        <p class="text-center text-gray-600">Data perdagangan akan ditampilkan di sini</p>
+      <!-- Level 4 - Kaur -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto relative mb-12">
+        <div class="bg-red-600 text-white rounded-lg p-6 shadow-lg text-center">
+          <div class="w-14 h-14 mx-auto bg-white rounded-full flex items-center justify-center mb-3">
+            <i class="fas fa-file-alt text-xl text-red-800"></i>
+          </div>
+          <h3 class="font-bold">Kaur Umum & TU</h3>
+          <p class="text-white/90 mt-1 text-sm">Bute Mokeba</p>
+        </div>
+        <div class="bg-red-600 text-white rounded-lg p-6 shadow-lg text-center">
+          <div class="w-14 h-14 mx-auto bg-white rounded-full flex items-center justify-center mb-3">
+            <i class="fas fa-chart-line text-xl text-red-800"></i>
+          </div>
+          <h3 class="font-bold">Kaur Perencanaan</h3>
+          <p class="text-white/90 mt-1 text-sm">Saiful Bilanga</p>
+        </div>
+        <div class="bg-red-600 text-white rounded-lg p-6 shadow-lg text-center">
+          <div class="w-14 h-14 mx-auto bg-white rounded-full flex items-center justify-center mb-3">
+            <i class="fas fa-calculator text-xl text-red-800"></i>
+          </div>
+          <h3 class="font-bold">Kaur Keuangan</h3>
+          <p class="text-white/90 mt-1 text-sm">Santi Laundja</p>
+        </div>
       </div>
-    </div>
 
+      <!-- Level 5 - Kepala Dusun -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <!-- Dusun I -->
+        <div class="space-y-4">
+          <div class="bg-red-500 text-white rounded-lg p-6 shadow-lg text-center">
+            <div class="w-14 h-14 mx-auto bg-white rounded-full flex items-center justify-center mb-3">
+              <i class="fas fa-home text-xl text-red-800"></i>
+            </div>
+            <h3 class="font-bold">Kepala Dusun I</h3>
+            <p class="text-white/90 mt-1 text-sm">Agustinus Ranuntu</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-red-400 text-white rounded-lg p-4 shadow-lg text-center">
+              <div class="w-10 h-10 mx-auto bg-white rounded-full flex items-center justify-center mb-2">
+                <i class="fas fa-users text-sm text-red-800"></i>
+              </div>
+              <h4 class="font-bold text-sm">Ketua RT I</h4>
+              <p class="text-white/90 mt-1 text-xs">Yosep Ralento</p>
+            </div>
+            <div class="bg-red-400 text-white rounded-lg p-4 shadow-lg text-center">
+              <div class="w-10 h-10 mx-auto bg-white rounded-full flex items-center justify-center mb-2">
+                <i class="fas fa-users text-sm text-red-800"></i>
+              </div>
+              <h4 class="font-bold text-sm">Ketua RT II</h4>
+              <p class="text-white/90 mt-1 text-xs">Karmon Tawolaya</p>
+            </div>
+          </div>
+        </div>
+        <!-- Dusun II -->
+        <div class="space-y-4">
+          <div class="bg-red-500 text-white rounded-lg p-6 shadow-lg text-center">
+            <div class="w-14 h-14 mx-auto bg-white rounded-full flex items-center justify-center mb-3">
+              <i class="fas fa-home text-xl text-red-800"></i>
+            </div>
+            <h3 class="font-bold">Kepala Dusun II</h3>
+            <p class="text-white/90 mt-1 text-sm">Santi Laundja</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-red-400 text-white rounded-lg p-4 shadow-lg text-center">
+              <div class="w-10 h-10 mx-auto bg-white rounded-full flex items-center justify-center mb-2">
+                <i class="fas fa-users text-sm text-red-800"></i>
+              </div>
+              <h4 class="font-bold text-sm">Ketua RT III</h4>
+              <p class="text-white/90 mt-1 text-xs">Darlin Moula</p>
+            </div>
+            <div class="bg-red-400 text-white rounded-lg p-4 shadow-lg text-center">
+              <div class="w-10 h-10 mx-auto bg-white rounded-full flex items-center justify-center mb-2">
+                <i class="fas fa-users text-sm text-red-800"></i>
+              </div>
+              <h4 class="font-bold text-sm">Ketua RT IV</h4>
+              <p class="text-white/90 mt-1 text-xs">Kristin Novelin OA</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  </main>
+    <!-- Potensi Desa -->
+    <section class="mb-12">
+      <h2 class="text-3xl font-bold text-red-800 mb-6">Potensi Desa</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div class="h-48 bg-red-100 flex items-center justify-center">
+            <i class="fas fa-tree text-6xl text-red-800"></i>
+          </div>
+          <div class="p-6">
+            <h3 class="font-bold text-xl mb-2">Pertanian</h3>
+            <p class="text-gray-700">Lahan pertanian yang subur dengan berbagai komoditas unggulan</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div class="h-48 bg-red-100 flex items-center justify-center">
+            <i class="fas fa-fish text-6xl text-red-800"></i>
+          </div>
+          <div class="p-6">
+            <h3 class="font-bold text-xl mb-2">Perikanan</h3>
+            <p class="text-gray-700">Potensi perikanan air tawar yang melimpah</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div class="h-48 bg-red-100 flex items-center justify-center">
+            <i class="fas fa-leaf text-6xl text-red-800"></i>
+          </div>
+          <div class="p-6">
+            <h3 class="font-bold text-xl mb-2">Wisata Alam</h3>
+            <p class="text-gray-700">Keindahan alam yang potensial untuk pengembangan wisata</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 
   <!-- Footer -->
   <footer class="bg-red-800 py-8 text-center text-white">
@@ -298,315 +532,35 @@
   </div><!-- end of root div -->
 
   <script>
+    function toggleMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('translate-x-full');
+    }
+
+    function showLoading() {
+      const overlay = document.getElementById('loading-overlay');
+      overlay.style.display = 'flex';
+    }
+
+    function hideLoading() {
+      const overlay = document.getElementById('loading-overlay');
+      overlay.style.display = 'none';
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-      // Register ChartJS datalabels plugin
-      Chart.register(ChartDataLabels);
-      
-      // Category switching functionality
-      const categoryButtons = document.querySelectorAll('.category-btn');
-      const contentSections = document.querySelectorAll('.content-section');
-
-      function switchCategory(category) {
-        // Update button styles
-        categoryButtons.forEach(btn => {
-          if (btn.dataset.category === category) {
-            btn.classList.remove('bg-red-100', 'text-red-800');
-            btn.classList.add('bg-red-800', 'text-white');
-          } else {
-            btn.classList.remove('bg-red-800', 'text-white');
-            btn.classList.add('bg-red-100', 'text-red-800');
+      const links = document.querySelectorAll('a[href]');
+      links.forEach(link => {
+        link.addEventListener('click', function(e) {
+          if (this.href && this.href !== window.location.href && !this.href.includes('#') && !this.href.startsWith('javascript:')) {
+            showLoading();
           }
-        });
-
-        // Show/hide content sections
-        contentSections.forEach(section => {
-          if (section.id === `${category}-content`) {
-            section.classList.remove('hidden');
-          } else {
-            section.classList.add('hidden');
-          }
-        });
-      }
-
-      // Add click handlers to category buttons
-      categoryButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation(); // Prevent event bubbling
-          
-          const category = btn.dataset.category;
-          
-          // Update all buttons first
-          categoryButtons.forEach(button => {
-            if (button.dataset.category === category) {
-              button.classList.remove('bg-red-100', 'text-red-800');
-              categoryButtons.forEach(button => {
-                if (button.dataset.category === category) {
-                  button.classList.remove('bg-red-100', 'text-red-800');
-                  button.classList.add('bg-red-800', 'text-white');
-                } else {
-                  button.classList.remove('bg-red-800', 'text-white');
-                  button.classList.add('bg-red-100', 'text-red-800');
-                }
-              });
-              button.classList.add('bg-red-800', 'text-white');
-            } else {
-              button.classList.remove('bg-red-800', 'text-white');
-              button.classList.add('bg-red-100', 'text-red-800');
-            }
-          });
-          
-      // Then update content visibility and reinitialize chart if needed
-      contentSections.forEach(section => {
-        if (section.id === `${category}-content`) {
-          section.classList.remove('hidden');
-          if (category === 'penduduk') {
-            // Reinitialize chart with animation
-            setTimeout(() => {
-              initGenderChart();
-            }, 50); // Small delay to ensure DOM is ready
-          } else if (category === 'cuaca') {
-            // Initialize weather bar chart
-            setTimeout(() => {
-              initWeatherChart();
-            }, 50);
-          }
-        } else {
-          section.classList.add('hidden');
-        }
-      });
         });
       });
+    });
 
-      // Initialize with Penduduk category active
-      const defaultCategory = 'penduduk';
-      const defaultButton = document.querySelector(`[data-category="${defaultCategory}"]`);
-      if (defaultButton) {
-        defaultButton.click();
-      }
-
-      // Initialize chart variable
-      let genderChart = null;
-      let weatherChart = null;
-      let sunshineChart = null;
-
-      // Function to create/update gender chart
-      function initGenderChart() {
-        // Destroy existing chart if it exists
-        if (genderChart) {
-          genderChart.destroy();
-        }
-
-        const ctx = document.getElementById('genderChart').getContext('2d');
-        genderChart = new Chart(ctx, {
-          type: 'pie',
-          data: {
-            labels: ['Laki-laki', 'Perempuan'],
-            datasets: [{
-              data: [524, 521],
-              backgroundColor: [
-                '#991b1b', // red-800
-                '#ef4444'  // red-500
-              ],
-              borderColor: '#ffffff',
-              borderWidth: 2
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            animation: {
-              duration: 1000,
-              easing: 'easeInOutQuart',
-              animateRotate: true,
-              animateScale: true
-            },
-            plugins: {
-              legend: {
-                position: 'bottom',
-                labels: {
-                  font: {
-                    family: 'Inter',
-                    size: 14
-                  },
-                  padding: 20
-                }
-              },
-              datalabels: {
-                color: '#ffffff',
-                font: {
-                  family: 'Inter',
-                  size: 24,
-                  weight: 'bold'
-                },
-                formatter: function(value, context) {
-                  const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
-                  const percentage = ((value / total) * 100).toFixed(1);
-                  return value + ' orang\n' + percentage + '%';
-                },
-                align: 'center',
-                anchor: 'center',
-                offset: 0,
-                padding: 8,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                borderRadius: 6,
-                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'
-              },
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    const label = context.label || '';
-                    const value = context.raw || 0;
-                    const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
-                    const percentage = ((value / total) * 100).toFixed(1);
-                    return `${label}: ${value} orang (${percentage}%)`;
-                  }
-                }
-              }
-            }
-          }
-        });
-      }
-
-      // Function to create/update weather bar chart
-      function initWeatherChart() {
-        if (weatherChart) {
-          weatherChart.destroy();
-        }
-        if (sunshineChart) {
-          sunshineChart.destroy();
-        }
-
-        const ctx = document.getElementById('weatherChart').getContext('2d');
-        weatherChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
-            datasets: [{
-              label: 'Suhu (°C)',
-              data: [27.5, 27.1, 27.7, 27.7, 28.4, 27.2, 28.0, 28.0, 28.5, 28.6, 28.3, 28.1],
-              backgroundColor: '#ef4444',
-              borderColor: '#991b1b',
-              borderWidth: 1,
-              borderRadius: 4
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            scales: {
-              y: {
-                beginAtZero: false,
-                title: {
-                  display: true,
-                  text: 'Suhu (°C)',
-                  font: {
-                    family: 'Inter',
-                    size: 14,
-                    weight: 'bold'
-                  }
-                }
-              },
-              x: {
-                title: {
-                  display: true,
-                  text: 'Bulan',
-                  font: {
-                    family: 'Inter',
-                    size: 14,
-                    weight: 'bold'
-                  }
-                }
-              }
-            },
-            plugins: {
-              legend: {
-                display: true,
-                position: 'top',
-                labels: {
-                  font: {
-                    family: 'Inter',
-                    size: 14
-                  }
-                }
-              },
-              tooltip: {
-                enabled: true,
-                callbacks: {
-                  label: function(context) {
-                    return context.parsed.y + ' °C';
-                  }
-                }
-              }
-            }
-          }
-        });
-
-        const ctxSunshine = document.getElementById('sunshineChart').getContext('2d');
-        sunshineChart = new Chart(ctxSunshine, {
-          type: 'bar',
-          data: {
-            labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
-            datasets: [{
-              label: 'Penyinaran Matahari (%)',
-              data: [45, 61, 50, 65, 64, 55, 69, 74, 85, 82, 72, 40],
-              backgroundColor: '#facc15',
-              borderColor: '#ca8a04',
-              borderWidth: 1,
-              borderRadius: 4
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 100,
-                title: {
-                  display: true,
-                  text: 'Penyinaran Matahari (%)',
-                  font: {
-                    family: 'Inter',
-                    size: 14,
-                    weight: 'bold'
-                  }
-                }
-              },
-              x: {
-                title: {
-                  display: true,
-                  text: 'Bulan',
-                  font: {
-                    family: 'Inter',
-                    size: 14,
-                    weight: 'bold'
-                  }
-                }
-              }
-            },
-            plugins: {
-              legend: {
-                display: true,
-                position: 'top',
-                labels: {
-                  font: {
-                    family: 'Inter',
-                    size: 14
-                  }
-                }
-              },
-              tooltip: {
-                enabled: true,
-                callbacks: {
-                  label: function(context) {
-                    return context.parsed.y + ' %';
-                  }
-                }
-              }
-            }
-          }
-        });
+    window.addEventListener('pageshow', function(event) {
+      if (event.persisted) {
+        hideLoading();
       }
     });
   </script>
