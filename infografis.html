@@ -436,7 +436,7 @@
                 color: '#ffffff',
                 font: {
                   family: 'Inter',
-                  size: 14,
+                  size: window.innerWidth <= 640 ? 10 : 24,
                   weight: 'bold'
                 },
                 formatter: function(value, context) {
