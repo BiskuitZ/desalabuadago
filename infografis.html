@@ -284,6 +284,89 @@
       if (event.persisted) {
         hideLoading();
       }
+      
+      // Initialize social welfare chart
+      window.initSocialWelfareChart = function() {
+        if (window.socialWelfareChart) window.socialWelfareChart.destroy();
+
+        const ctx = document.getElementById('socialWelfareChart').getContext('2d');
+        window.socialWelfareChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['KK Prasejahtera', 'KK Sejahtera', 'KK Mampu', 'KK Sedang', 'KK Kurang Mampu'],
+            datasets: [{
+              label: 'Jumlah KK',
+              data: [103, 80, 6, 200, 79],
+              backgroundColor: [
+                '#991b1b',
+                '#dc2626',
+                '#ef4444',
+                '#f87171',
+                '#fca5a5'
+              ],
+              borderColor: '#ffffff',
+              borderWidth: 1,
+              borderRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            indexAxis: 'y',
+            animation: {
+              duration: 1000,
+              easing: 'easeInOutQuart'
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Jumlah Kepala Keluarga',
+                  font: {
+                    family: 'Inter',
+                    size: 14,
+                    weight: 'bold'
+                  }
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Kategori',
+                  font: {
+                    family: 'Inter',
+                    size: 14,
+                    weight: 'bold'
+                  }
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              },
+              datalabels: {
+                color: '#ffffff',
+                font: {
+                  family: 'Inter',
+                  size: window.innerWidth <= 640 ? 10 : 14,
+                  weight: 'bold'
+                },
+                formatter: function(value) {
+                  return value + ' KK';
+                },
+                anchor: 'center',
+                align: 'center',
+                offset: 0,
+                padding: 4,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                borderRadius: 4
+              }
+            }
+          }
+        });
+      }
     });
   </script>
 
@@ -382,8 +465,32 @@
 
     <div id="sosial-content" class="content-section hidden">
       <div class="bg-white rounded-lg shadow-lg p-6 mb-12 max-w-3xl mx-auto">
-        <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Data Sosial</h3>
-        <p class="text-center text-gray-600">Data sosial akan ditampilkan di sini</p>
+        <h3 class="text-xl font-bold text-red-800 mb-6 text-center">Kesejahteraan Sosial</h3>
+        <div class="w-full max-w-2xl mx-auto">
+          <canvas id="socialWelfareChart"></canvas>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-8">
+          <div class="bg-red-50 rounded-lg p-4 text-center">
+            <p class="text-2xl font-bold text-red-800">103</p>
+            <p class="text-sm text-gray-700">KK Prasejahtera</p>
+          </div>
+          <div class="bg-red-50 rounded-lg p-4 text-center">
+            <p class="text-2xl font-bold text-red-800">80</p>
+            <p class="text-sm text-gray-700">KK Sejahtera</p>
+          </div>
+          <div class="bg-red-50 rounded-lg p-4 text-center">
+            <p class="text-2xl font-bold text-red-800">6</p>
+            <p class="text-sm text-gray-700">KK Mampu</p>
+          </div>
+          <div class="bg-red-50 rounded-lg p-4 text-center">
+            <p class="text-2xl font-bold text-red-800">200</p>
+            <p class="text-sm text-gray-700">KK Sedang</p>
+          </div>
+          <div class="bg-red-50 rounded-lg p-4 text-center">
+            <p class="text-2xl font-bold text-red-800">79</p>
+            <p class="text-sm text-gray-700">KK Kurang Mampu</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -462,6 +569,10 @@
                 setTimeout(() => {
                   initWeatherChart();
                 }, 50);
+              } else if (category === 'sosial') {
+                setTimeout(() => {
+                  initSocialWelfareChart();
+                }, 50);
               }
             } else {
               section.classList.add('hidden');
@@ -481,6 +592,7 @@
       window.genderChart = null;
       window.weatherChart = null;
       window.sunshineChart = null;
+      window.socialWelfareChart = null;
 
       // Global chart initialization functions
       window.initGenderChart = function() {
